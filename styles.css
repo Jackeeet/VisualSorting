@@ -1,0 +1,13 @@
+div{
+    background-color: powderblue;
+    margin: auto;
+}
+h3{
+    margin-top: 0;
+    margin-bottom: 0;
+}
+.sortButton{
+    width: 100;
+    height: 50;
+    background-color: white;
+}

@@ -6,9 +6,13 @@ function bubbleSort(arr) {
             }
         }
     }
+
+    return arr;
 }
 
-function shellSort(arr){
+function shellSort(arr) {
+    // there's a bug somewhere in here
+
     let gap = ~~(arr.length / 2);
 
     for (let gap = ~~(arr.length / 2); gap > 0; gap = ~~(gap / 2)){
@@ -22,6 +26,8 @@ function shellSort(arr){
             arr[j] = temp;
         }
     }
+
+    return arr;
 }
 
 function mergeSort(arr){
@@ -68,10 +74,23 @@ function quickSort(arr){
     // todo
 }
 
+function generateArray() {
+    let size = document.getElementById("arrSize").value;
+    size = parseInt(size);
+    arr = Array.from({length: size}, () => Math.floor(Math.random() * 50) + 1);
+    document.getElementById("startArray").innerHTML = arr;
+    document.getElementById("resultArray").innerHTML = "";
+}
 
-let arr = [7, 3, 4, 1, 5, 2];
-document.getElementById("startArray").innerHTML = arr;
+function runSorting(sortFunction, array) {
+    arr = sortFunction(array);
+    document.getElementById("resultArray").innerHTML = arr;
+}
 
-// shellSort(arr);
-arr = mergeSort(arr);
-document.getElementById("resultArray").innerHTML = arr;
+let arr = [];
+generateArray();
+document.getElementById("generateArray").onclick = generateArray;
+document.getElementById("bubblesort").onclick = function() { runSorting(bubbleSort, arr) };
+document.getElementById("shellsort").onclick = function() { runSorting(shellSort, arr) };
+document.getElementById("mergesort").onclick = function() { runSorting(mergeSort, arr) };
+document.getElementById("quicksort").onclick = function() { runSorting(quickSort, arr) };

@@ -3,14 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <title>Sorting algorithms demo</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
 </head>
 <body>
+    <div>
+        <h3>
+            Current array:
+        </h3>
+    </div>
     <div id="startArray"></div>
+    <div>
+        <h3>
+            Generate an array of
+            <input type="number" id="arrSize" name="arrSize" min="1" max="100" value="20">
+            numbers:
+            <input type="submit" id="generateArray" name="generateArray" value="Generate">
+        </h3>
+    </div>
     <div id="sortButtons">
-        <input type="button" name="bubble" value="Bubble Sort"> 
-        <input type="button" name="shell" value="Shell Sort"> 
-        <input type="button" name="merge" value="Merge Sort"> 
-        <input type="button" name="quick" value="Quick Sort"> 
+        <input type="button" class="sortButton" id="bubblesort" name="bubblesort" value="Bubble Sort"> 
+        <input type="button" class="sortButton" id="shellsort" name="shellsort" value="Shell Sort"> 
+        <input type="button" class="sortButton" id="mergesort" name="mergesort" value="Merge Sort"> 
+        <input type="button" class="sortButton" id="quicksort" name="quicksort" value="Quick Sort"> 
     </div>
     <div id="resultArray"></div>
 
