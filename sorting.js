@@ -74,23 +74,71 @@ function quickSort(arr){
     // todo
 }
 
-function generateArray() {
-    let size = document.getElementById("arrSize").value;
-    size = parseInt(size);
-    arr = Array.from({length: size}, () => Math.floor(Math.random() * 50) + 1);
-    document.getElementById("startArray").innerHTML = arr;
-    document.getElementById("resultArray").innerHTML = "";
+class SortItem {
+    constructor(value, width, id) {
+        this.height = value * 9;
+        this.width = width;
+        this.id = id;
+        this.value = value;
+    }
+
+    draw() {
+        let itemStartX = this.id * this.width;
+        let itemStartY = canvasHeight - this.height;
+        context.fillStyle = "powderblue";
+        context.fillRect(itemStartX, itemStartY, this.width, this.height);
+
+        let valStartX = itemStartX + this.width / 2;
+        let valStartY = 12;
+        context.font = "12px serif";
+        context.fillStyle = "black";
+        context.fillText(this.value, valStartX, valStartY);
+    }
 }
 
+function generateItemArray(arraySize) {
+    context.clearRect(0, 0, canvas.width, canvas.height);
+
+    let itemWidth = canvas.width / arraySize;
+    let vals = Array.from({length: arraySize}, () => Math.floor(Math.random() * 50) + 1);
+    for (let i = 0; i < arraySize; i++) {
+        let item = new SortItem(vals[i], itemWidth, i);
+        arr.push(item);
+        item.draw();
+    }
+}
+
+function getArraySize(){
+    let arraySize = document.getElementById("arrSize").value;
+    return parseInt(arraySize);
+}
+
+// this is likely going to disappear soon
 function runSorting(sortFunction, array) {
     arr = sortFunction(array);
-    document.getElementById("resultArray").innerHTML = arr;
 }
 
-let arr = [];
-generateArray();
-document.getElementById("generateArray").onclick = generateArray;
-document.getElementById("bubblesort").onclick = function() { runSorting(bubbleSort, arr) };
-document.getElementById("shellsort").onclick = function() { runSorting(shellSort, arr) };
-document.getElementById("mergesort").onclick = function() { runSorting(mergeSort, arr) };
-document.getElementById("quicksort").onclick = function() { runSorting(quickSort, arr) };
+
+var arr = [];
+var canvas;
+var context;
+const canvasHeight = 500;
+const canvasWidthModifier = 0.95;
+const defaultArraySize = 20;
+
+window.onload = function() {
+    canvas = document.getElementById("canvas");
+    canvas.setAttribute('width', window.innerWidth * canvasWidthModifier);
+    canvas.setAttribute('height', canvasHeight);
+    context = canvas.getContext("2d");
+
+    generateItemArray(defaultArraySize);
+    document.getElementById("generateItemArray").onclick = function() {
+        let arraySize = getArraySize();
+        generateItemArray(arraySize);
+    }
+    document.getElementById("bubblesort").onclick = function() { runSorting(bubbleSort, arr) };
+    document.getElementById("shellsort").onclick = function() { runSorting(shellSort, arr) };
+    document.getElementById("mergesort").onclick = function() { runSorting(mergeSort, arr) };
+    document.getElementById("quicksort").onclick = function() { runSorting(quickSort, arr) };
+}

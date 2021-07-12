@@ -8,16 +8,10 @@
 <body>
     <div>
         <h3>
-            Current array:
-        </h3>
-    </div>
-    <div id="startArray"></div>
-    <div>
-        <h3>
             Generate an array of
-            <input type="number" id="arrSize" name="arrSize" min="1" max="100" value="20">
+            <input type="number" id="arrSize" name="arrSize" min="1" max="50" value="20">
             numbers:
-            <input type="submit" id="generateArray" name="generateArray" value="Generate">
+            <input type="submit" id="generateItemArray" name="generateItemArray" value="Generate">
         </h3>
     </div>
     <div id="sortButtons">
@@ -27,6 +21,9 @@
         <input type="button" class="sortButton" id="quicksort" name="quicksort" value="Quick Sort"> 
     </div>
     <div id="resultArray"></div>
+    <div id="animationContainer">
+        <canvas id="canvas"></canvas>
+    </div>
 
     <script src="sorting.js"></script>
 </body>
