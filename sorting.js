@@ -1,144 +1,147 @@
-function bubbleSort(arr) {
-    for (let i = 0; i < arr.length; i++) {
-        for (let j = 0; j < arr.length - i - 1; j++) {
-            if (arr[j] > arr[j + 1]) {
-                [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
-            }
-        }
-    }
+function swap(item1, item2) {
+    return new Promise(resolve => {
+        let tf1 = getComputedStyle(item1).getPropertyValue("transform");
+        let tf2 = getComputedStyle(item2).getPropertyValue("transform");
 
-    return arr;
+        item1.style.transform = tf2;
+        item2.style.transform = tf1;
+
+        requestAnimationFrame(
+            function() {
+                setTimeout(
+                    () => {
+                        field.insertBefore(item2, item1);
+                        resolve();
+                    }, 500);
+            }); 
+    }); 
 }
 
-function shellSort(arr) {
+async function bubbleSort() {
+    let itemArray = document.querySelectorAll(".sortItem");
+
+    for (let i = 0; i < itemArray.length; i++) {
+        for (let j = 0; j < itemArray.length - i - 1; j++) {
+            let item1 = itemArray[j];
+            let item2 = itemArray[j + 1]; 
+
+            item1.style.backgroundColor = selectedItemColour;
+            item2.style.backgroundColor = selectedItemColour;
+
+            await new Promise(resolve => setTimeout(() => { resolve(); }, 500));
+
+            if (getValue(item1) > getValue(item2)) {
+                await swap(item1, item2);
+                itemArray = document.querySelectorAll(".sortItem");
+            }
+
+            item1.style.backgroundColor = defaultItemColour;
+            item2.style.backgroundColor = defaultItemColour;
+        }
+    }
+}
+
+async function shellSort() {
+    let itemArray = document.querySelectorAll(".sortItem");
     // there's a bug somewhere in here
+    let gap = ~~(itemArray.length / 2);
 
-    let gap = ~~(arr.length / 2);
+    for (let gap = ~~(itemArray.length / 2); gap > 0; gap = ~~(gap / 2)){
+        for (let i = gap; i < itemArray.length; i++){
+            let temp = itemArray[i];
 
-    for (let gap = ~~(arr.length / 2); gap > 0; gap = ~~(gap / 2)){
-        for (let i = gap; i < arr.length; i++){
-            let temp = arr[i];
-
-            var j;
-            for (j = i; j >= gap && arr[j] < arr[j-gap]; j -= gap){
-                arr[j] = arr[j-gap];
+            let j;
+            for (j = i; j >= gap && itemArray[j].value < itemArray[j-gap].value; j -= gap){
+                itemArray[j] = itemArray[j-gap];
             }
-            arr[j] = temp;
+            itemArray[j] = temp;
         }
     }
-
-    return arr;
 }
 
-function mergeSort(arr){
-    if (arr.length <= 1){
-        return arr;
-    }
-
-    let middle = ~~(arr.length / 2);
-    let left = arr.slice(0, middle);
-    let right = arr.slice(middle, arr.length);
-
-    left = mergeSort(left);
-    right = mergeSort(right);
-
-    return merge(left, right);
-}
-
-function merge(left, right){
-    let l = 0;
-    let r = 0;
-    let result = [];
-
-    while (l < left.length && r < right.length) {
-        if (left[l] <= right[r]) {
-            result.push(left[l]);
-            l++;
-        }
-        else {
-            result.push(right[r]);
-            r++;
-        }
-    }
-
-    if (l < left.length) {
-        result.push(...left.slice(l, left.length));
-    }
-    else {
-        result.push(...right.slice(r, right.length));
-    }
-    return result;
-}
-
-function quickSort(arr){
+async function quickSort() {
     // todo
 }
 
-class SortItem {
-    constructor(value, width, id) {
-        this.height = value * 9;
-        this.width = width;
-        this.id = id;
-        this.value = value;
-    }
-
-    draw() {
-        let itemStartX = this.id * this.width;
-        let itemStartY = canvasHeight - this.height;
-        context.fillStyle = "powderblue";
-        context.fillRect(itemStartX, itemStartY, this.width, this.height);
-
-        let valStartX = itemStartX + this.width / 2;
-        let valStartY = 12;
-        context.font = "12px serif";
-        context.fillStyle = "black";
-        context.fillText(this.value, valStartX, valStartY);
+function removeChildren(element) {
+    while(element.firstChild) {
+        element.removeChild(element.lastChild);
     }
 }
 
 function generateItemArray(arraySize) {
-    context.clearRect(0, 0, canvas.width, canvas.height);
+    removeChildren(field);    
 
-    let itemWidth = canvas.width / arraySize;
-    let vals = Array.from({length: arraySize}, () => Math.floor(Math.random() * 50) + 1);
+    let itemWidth = field.clientWidth / arraySize;
+    let itemHeightModifier = getItemHeightModifier();
+    let values = Array.from({length: arraySize}, () => Math.floor(Math.random() * maxItemValue) + 1);
+
     for (let i = 0; i < arraySize; i++) {
-        let item = new SortItem(vals[i], itemWidth, i);
-        arr.push(item);
-        item.draw();
+        let sortItem = createSortItem(i, itemWidth, values[i] * itemHeightModifier, values[i]);
+        field.appendChild(sortItem);
     }
 }
 
-function getArraySize(){
+function createSortItem(index, width, height, value) {
+    let item = document.createElement("div");
+    item.style.width = `${width}px`
+    item.style.height = `${height}px`;
+    item.style.transform = `translateX(${index * width}px)`;
+    item.classList.add("sortItem");
+
+    let label = createValueLabel(value);
+    item.appendChild(label);
+    return item;
+}
+
+function createValueLabel(value) {
+    let label = document.createElement("div");
+    label.innerHTML = value;
+    label.classList.add("sortItemLabel");
+    return label;
+}   
+
+function getValue(sortItem) {
+    return parseInt(sortItem.childNodes[0].innerHTML);
+}
+
+function getArraySize() {
     let arraySize = document.getElementById("arrSize").value;
     return parseInt(arraySize);
 }
 
-// this is likely going to disappear soon
-function runSorting(sortFunction, array) {
-    arr = sortFunction(array);
+function getItemHeightModifier() {
+    // why isnt this working 
+
+    // let fh = field.clientHeight;
+    // let temp = fh / maxItemValue;
+    // let res = Math.floor(temp) - 1;
+
+    // return Math.floor(field.height / maxItemValue) - 1;
+
+    return 10;
 }
 
-
-var arr = [];
-var canvas;
-var context;
-const canvasHeight = 500;
-const canvasWidthModifier = 0.95;
+const fieldHeight = 500;
+const fieldWidthModifier = 0.75;
 const defaultArraySize = 20;
+const maxItemValue = 50;
+const defaultItemColour = "#384EC7";
+const selectedItemColour = "#38C7B1";
+
+var field;
 
 window.onload = function() {
-    canvas = document.getElementById("canvas");
-    canvas.setAttribute('width', window.innerWidth * canvasWidthModifier);
-    canvas.setAttribute('height', canvasHeight);
-    context = canvas.getContext("2d");
+    field = document.getElementById("animationField");
+    field.setAttribute("width", `${window.innerWidth * fieldWidthModifier}px`);
+    field.setAttribute("height", `${fieldHeight}px`);
 
     generateItemArray(defaultArraySize);
     document.getElementById("generateItemArray").onclick = function() {
         let arraySize = getArraySize();
         generateItemArray(arraySize);
     }
-    document.getElementById("bubblesort").onclick = function() { runSorting(bubbleSort, arr) };
-    document.getElementById("shellsort").onclick = function() { runSorting(shellSort, arr) };
-    document.getElementById("mergesort").onclick = function() { runSorting(mergeSort, arr) };
-    document.getElementById("quicksort").onclick = function() { runSorting(quickSort, arr) };
+    document.getElementById("bubblesort").onclick = function() { bubbleSort() };
+    document.getElementById("shellsort").onclick = function() { shellSort() };
+    document.getElementById("quicksort").onclick = function() { quickSort() };
 }
