@@ -6,8 +6,8 @@
     <link rel="stylesheet" type="text/css" href="styles.css">
 </head>
 <body>
-    <div class="setupRow">
-        <div class="setup">
+    <div class="row">
+        <div class="rowContents">
             <h3>
                 Generate an array of
                 <input type="number" id="arrSize" min="1" max="50" value="20">
@@ -15,18 +15,24 @@
                 <input type="submit" id="arrayGenerator" value="Generate">
             </h3>
         </div>
-        <div class="sortRow">
-            <div class="sortButtonGroup">
-                <input type="button" class="sortButton" id="bubblesort" name="bubblesort" value="Bubble Sort"> 
-                <input type="button" class="sortButton" id="shellsort" name="shellsort" value="Shell Sort"> 
-                <input type="button" class="sortButton" id="quicksort" name="quicksort" value="Quick Sort"> 
-            </div>
-            <div class="timerGroup" id="timer">
-                00:00
-            </div>
+    </div>
+    <div class="row">
+        <div class="rowContents">
+            <input type="button" class="sortButton" id="bubblesort" value="Bubble Sort"> 
+            <input type="button" class="sortButton" id="shellsort" value="Shell Sort"> 
+            <input type="button" class="sortButton" id="quicksort" value="Quick Sort"> 
         </div>
-        <div id="animationField"></div>
+    </div>
+    <div class="row">
+        <div class="rowContents">
+            <h4>
+                <span id="timerMessage">Choose a sorting algorithm to begin</span>
+                <span id="timer"></span>
+            </h4>
+        </div>
+    </div>
+    <div id="animationField"></div>
 
-        <script src="sorting.js"></script>
-    </body>
-    </html>
+    <script src="sorting.js"></script>
+</body>
+</html>

@@ -1,3 +1,5 @@
+// ------- SORTING ALGORITHMS -------
+
 function swap(item1, item2) {
     return new Promise(resolve => {
         let tf1 = getComputedStyle(item1).getPropertyValue("transform");
@@ -62,6 +64,20 @@ async function shellSort() {
 async function quickSort() {
     // todo
 }
+// -------------
+
+
+// ------- TIMER LOGIC -------
+// -------------
+
+
+// ------- WINDOW UTILITY FUNCTIONS -------
+
+function resetWindowState() {
+    removeChildren(field);
+    disableSortButtons(false);
+    updateTimerMessage("", true);
+}
 
 function removeChildren(element) {
     while(element.firstChild) {
@@ -70,7 +86,7 @@ function removeChildren(element) {
 }
 
 function generateItemArray(arraySize) {
-    removeChildren(field);
+    resetWindowState();
 
     let itemWidth = field.clientWidth / arraySize;
     let itemHeightModifier = getItemHeightModifier();
@@ -80,6 +96,18 @@ function generateItemArray(arraySize) {
         let sortItem = createSortItem(i, itemWidth, values[i] * itemHeightModifier, values[i]);
         field.appendChild(sortItem);
     }
+}
+
+function getItemHeightModifier() {
+    // why isnt this working 
+
+    // let fh = field.clientHeight;
+    // let temp = fh / maxItemValue;
+    // let res = Math.floor(temp) - 1;
+
+    // return Math.floor(field.height / maxItemValue) - 1;
+
+    return 10;
 }
 
 function createSortItem(index, width, height, value) {
@@ -107,20 +135,39 @@ function getValue(sortItem) {
 
 function getArraySize() {
     let arraySize = document.getElementById("arrSize").value;
-    return parseInt(arraySize);
+    let size = parseInt(arraySize);
+    if (size >= 2 && size <= 50){
+        return size;
+    }
+    alert("Please enter a number between 2 and 50");
 }
 
-function getItemHeightModifier() {
-    // why isnt this working 
+function updateTimerMessage(sortName, resetting = false) {
+    let messageSpan = document.getElementById("timerMessage");
+    messageSpan.innerHTML = resetting ? 
+    "Choose a sorting algorithm to begin" : `Sorting using ${sortName}:`;
 
-    // let fh = field.clientHeight;
-    // let temp = fh / maxItemValue;
-    // let res = Math.floor(temp) - 1;
-
-    // return Math.floor(field.height / maxItemValue) - 1;
-
-    return 10;
+    // todo figure out what to put instead of 00:00
+    let timerSpan = document.getElementById("timer");
+    timerSpan.innerHTML = resetting ? "" : "00:00"
 }
+
+function disableSortButtons(disable) {
+    let buttons = document.querySelectorAll(".sortButton");
+    for (let button of buttons) {
+        button.disabled = disable;
+    }
+}
+
+function runSorting(sortFunction, sortName) {
+    disableSortButtons(true);
+    updateTimerMessage(sortName);
+    sortFunction();
+}
+// -------------
+
+
+// ------- SCRIPT EXECUTION -------
 
 const fieldHeight = 500;
 const fieldWidthModifier = 0.75;
@@ -144,8 +191,9 @@ window.onload = function() {
         generateItemArray(arraySize);
     }
 
-
-    document.getElementById("bubblesort").onclick = bubbleSort;
+    document.getElementById("bubblesort").onclick = function () {
+        runSorting(bubbleSort, "Bubble Sort");
+    };
     document.getElementById("shellsort").onclick = shellSort;
     document.getElementById("quicksort").onclick = quickSort;
 }

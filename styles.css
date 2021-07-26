@@ -14,12 +14,17 @@ h3 {
     font-size: 2rem;
 }
 
-.setupRow, .sortRow { 
+h4 {
+    margin-top: 0;
+    margin-bottom: 0;
+    font-size: 1.5rem;
+}
+
+.row { 
     text-align: center;
 }
 
-.setup {
-    width: 50%;
+.rowContents {
     display: inline-block;
     margin: 5px 20px;
 }
@@ -31,15 +36,10 @@ h3 {
     margin-left: 0px;
 }
 
-.sortButtonGroup, .timerGroup {
-    display: inline-block;
-    margin: 5px 20px;
-}
-
-#timer {
+/*#timer {
     float: right;
     font-size: 1.5rem;
-}
+}*/
 
 .sortButton, #arrayGenerator {
     background-color: #384EC7;
@@ -55,6 +55,10 @@ h3 {
 .sortButton:hover, #arrayGenerator:hover {
     background-color: #38C7B1;
     box-shadow: 2px 2px 2px 1px rgba(0,0,0,0.2);
+}
+
+.sortButton:disabled {
+    background-color: #B3D6E9;
 }
 
 #animationField {
