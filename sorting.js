@@ -12,7 +12,7 @@ function swap(item1, item2) {
                     () => {
                         field.insertBefore(item2, item1);
                         resolve();
-                    }, 500);
+                    }, delayMilliseconds);
             }); 
     }); 
 }
@@ -28,7 +28,7 @@ async function bubbleSort() {
             item1.style.backgroundColor = selectedItemColour;
             item2.style.backgroundColor = selectedItemColour;
 
-            await new Promise(resolve => setTimeout(() => { resolve(); }, 500));
+            await new Promise(resolve => setTimeout(() => { resolve(); }, delayMilliseconds));
 
             if (getValue(item1) > getValue(item2)) {
                 await swap(item1, item2);
@@ -70,7 +70,7 @@ function removeChildren(element) {
 }
 
 function generateItemArray(arraySize) {
-    removeChildren(field);    
+    removeChildren(field);
 
     let itemWidth = field.clientWidth / arraySize;
     let itemHeightModifier = getItemHeightModifier();
@@ -128,8 +128,10 @@ const defaultArraySize = 20;
 const maxItemValue = 50;
 const defaultItemColour = "#384EC7";
 const selectedItemColour = "#38C7B1";
+const delayMilliseconds = 500;
 
 var field;
+var seconds;
 
 window.onload = function() {
     field = document.getElementById("animationField");
@@ -137,11 +139,13 @@ window.onload = function() {
     field.setAttribute("height", `${fieldHeight}px`);
 
     generateItemArray(defaultArraySize);
-    document.getElementById("generateItemArray").onclick = function() {
+    document.getElementById("arrayGenerator").onclick = function() {
         let arraySize = getArraySize();
         generateItemArray(arraySize);
     }
-    document.getElementById("bubblesort").onclick = function() { bubbleSort() };
-    document.getElementById("shellsort").onclick = function() { shellSort() };
-    document.getElementById("quicksort").onclick = function() { quickSort() };
+
+
+    document.getElementById("bubblesort").onclick = bubbleSort;
+    document.getElementById("shellsort").onclick = shellSort;
+    document.getElementById("quicksort").onclick = quickSort;
 }
