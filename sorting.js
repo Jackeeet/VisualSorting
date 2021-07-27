@@ -27,13 +27,11 @@ async function bubbleSort(itemArray) {
             let item1 = itemArray[j];
             let item2 = itemArray[j + 1]; 
 
-            setItemPairColour(item1, item2, selectedItemColour);
-            await new Promise(resolve => setTimeout(() => { resolve(); }, delayMilliseconds));
-
+            await setItemPairColour(item1, item2, selectedItemColour);
             if (getValue(item1) > getValue(item2)) {
                 await swap(itemArray, j, j + 1);
             }
-            setItemPairColour(item1, item2);
+            await setItemPairColour(item1, item2, defaultItemColour, false);
         }
     }
 }
@@ -44,15 +42,13 @@ async function insertionSort(itemArray) {
             let item1 = itemArray[j];
             let item2 = itemArray[j - 1];
 
-            setItemPairColour(item1, item2, selectedItemColour);
-            await new Promise(resolve => setTimeout(() => { resolve(); }, delayMilliseconds));
-
+            await setItemPairColour(item1, item2, selectedItemColour);
             if (getValue(item1) >= getValue(item2)) {
-                setItemPairColour(item1, item2);
+                await setItemPairColour(item1, item2, defaultItemColour, false);
                 break;
             }
             await swap(itemArray, j, j - 1);
-            setItemPairColour(item1, item2);
+            await setItemPairColour(item1, item2, defaultItemColour, false);
         }
     }
 }
@@ -69,15 +65,13 @@ async function shellSort(itemArray) {
                 let item1 = itemArray[j];
                 let item2 = itemArray[j - gap];
                 
-                setItemPairColour(item1, item2, selectedItemColour);
-                await new Promise(resolve => setTimeout(() => { resolve(); }, delayMilliseconds));
-                
+                await setItemPairColour(item1, item2, selectedItemColour);
                 if (getValue(item2) > getValue(temp)) {
                     // itemArray[j] = itemArray[j - gap];
                     await swap(item1, item2);
                 }
 
-                setItemPairColour(item1, item2);
+                await setItemPairColour(item1, item2, defaultItemColour, false);
             }
             await swap(temp, itemArray[j]);
             temp.style.backgroundColor = defaultItemColour;
@@ -95,22 +89,19 @@ async function selectionSort(itemArray) {
             minItem = itemArray[minValueIndex];
             nextItem = itemArray[j];
 
-            setItemPairColour(minItem, nextItem, selectedItemColour);
-            await new Promise(resolve => setTimeout(() => { resolve(); }, delayMilliseconds));
+            await setItemPairColour(minItem, nextItem, selectedItemColour);
 
             if (getValue(nextItem) < getValue(minItem)) {
                 minValueIndex = j;
             }
-            setItemPairColour(minItem, nextItem);
+            await setItemPairColour(minItem, nextItem, defaultItemColour, false);
         }
         
         let currentItem = itemArray[i];
-        setItemPairColour(minItem, currentItem, selectedItemColour);
-        await new Promise(resolve => setTimeout(() => { resolve(); }, delayMilliseconds));
+        await setItemPairColour(minItem, currentItem, selectedItemColour);
 
         await swap(itemArray, minValueIndex, i);
-        setItemPairColour(minItem, currentItem);
-        await new Promise(resolve => setTimeout(() => { resolve(); }, delayMilliseconds));
+        await setItemPairColour(minItem, currentItem, defaultItemColour);
     }
 }
 
@@ -122,16 +113,46 @@ async function quickSort(itemArray) {
 // -------------
 
 
+// ------- SORT ITEM LOGIC -------
+
+async function setItemPairColour(item1, item2, colour, addDelay = true) {
+    item1.style.backgroundColor = colour;
+    item2.style.backgroundColor = colour;
+    if (addDelay) {
+        await new Promise(resolve => setTimeout(() => { resolve(); }, delayMilliseconds));
+    }
+}
+
+function createSortItem(index, width, height, value) {
+    let item = document.createElement("div");
+    item.style.width = `${width}px`
+    item.style.height = `${height}px`;
+    item.style.transform = `translateX(${index * width}px)`;
+    item.classList.add("sortItem");
+
+    let label = createValueLabel(value);
+    item.appendChild(label);
+    return item;
+}
+
+function createValueLabel(value) {
+    let label = document.createElement("div");
+    label.innerHTML = value;
+    label.classList.add("sortItemLabel");
+    return label;
+}   
+
+function getValue(sortItem) {
+    return parseInt(sortItem.childNodes[0].innerHTML);
+}
+// -------------
+
+
 // ------- TIMER LOGIC -------
 // -------------
 
 
 // ------- WINDOW UTILITY FUNCTIONS -------
-
-function setItemPairColour(item1, item2, colour = defaultItemColour) {
-    item1.style.backgroundColor = colour;
-    item2.style.backgroundColor = colour;
-}
 
 function resetWindowState() {
     removeChildren(field);
@@ -159,7 +180,6 @@ function generateItemArray(arraySize) {
 }
 
 function getItemHeightModifier() {
-
     // let fh = field.clientHeight;
     // let temp = fh / maxItemValue;
     // let res = Math.floor(temp) - 1;
@@ -167,29 +187,6 @@ function getItemHeightModifier() {
     // return Math.floor(field.height / maxItemValue) - 1;
 
     return 10;
-}
-
-function createSortItem(index, width, height, value) {
-    let item = document.createElement("div");
-    item.style.width = `${width}px`
-    item.style.height = `${height}px`;
-    item.style.transform = `translateX(${index * width}px)`;
-    item.classList.add("sortItem");
-
-    let label = createValueLabel(value);
-    item.appendChild(label);
-    return item;
-}
-
-function createValueLabel(value) {
-    let label = document.createElement("div");
-    label.innerHTML = value;
-    label.classList.add("sortItemLabel");
-    return label;
-}   
-
-function getValue(sortItem) {
-    return parseInt(sortItem.childNodes[0].innerHTML);
 }
 
 function getArraySize() {
