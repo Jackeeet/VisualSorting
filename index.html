@@ -2,24 +2,29 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Sorting algorithms demo</title>
+    <title>In-place Sorting Algorithms</title>
     <link rel="stylesheet" type="text/css" href="styles.css">
 </head>
 <body>
     <div class="row">
         <div class="rowContents">
             <h3>
-                Generate an array of
-                <input type="number" id="arrSize" min="1" max="50" value="20">
-                numbers:
-                <input type="submit" id="arrayGenerator" value="Generate">
+                <span>
+                    Generate an array of
+                    <input type="number" id="arrSize" min="1" max="50" value="20">
+                    numbers:
+                    <input type="submit" id="arrayGenerator" value="Generate">
+                </span>
             </h3>
         </div>
     </div>
     <div class="row">
         <div class="rowContents">
             <input type="button" class="sortButton" id="bubblesort" value="Bubble Sort"> 
-            <input type="button" class="sortButton" id="shellsort" value="Shell Sort"> 
+            <input type="button" class="sortButton" id="insertionsort" value="Insertion Sort"> 
+            <input type="button" class="sortButton" id="shellsort" value="Shell Sort">
+            <input type="button" class="sortButton" id="selectionsort" value="Selection Sort">  
+            <input type="button" class="sortButton" id="heapsort" value="Heapsort"> 
             <input type="button" class="sortButton" id="quicksort" value="Quick Sort"> 
         </div>
     </div>
