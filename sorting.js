@@ -24,10 +24,8 @@ function swap(arr, index1, index2) {
 async function bubbleSort(itemArray) {
     for (let i = 0; i < itemArray.length; i++) {
         for (let j = 0; j < itemArray.length - i - 1; j++) {
-            let item1 = itemArray[j];
-            let item2 = itemArray[j + 1]; 
+            [item1, item2] = await selectItemsByIndex(itemArray, j, j + 1);
 
-            await setItemPairColour(item1, item2, selectedItemColour);
             if (getValue(item1) > getValue(item2)) {
                 await swap(itemArray, j, j + 1);
             }
@@ -38,17 +36,15 @@ async function bubbleSort(itemArray) {
 
 async function insertionSort(itemArray) {
     for (let i = 1; i < itemArray.length; i++) {
-        for (let j = i; j > 0; j--) {
-            let item1 = itemArray[j];
-            let item2 = itemArray[j - 1];
+        for (let current = i; current > 0; current--) {
+            [currentItem, previousItem] = await selectItemsByIndex(itemArray, current, current - 1);
 
-            await setItemPairColour(item1, item2, selectedItemColour);
-            if (getValue(item1) >= getValue(item2)) {
-                await setItemPairColour(item1, item2, defaultItemColour, false);
+            if (getValue(currentItem) >= getValue(previousItem)) {
+                await setItemPairColour(currentItem, previousItem, defaultItemColour, false);
                 break;
             }
-            await swap(itemArray, j, j - 1);
-            await setItemPairColour(item1, item2, defaultItemColour, false);
+            await swap(itemArray, current, current - 1);
+            await setItemPairColour(currentItem, previousItem, defaultItemColour, false);
         }
     }
 }
@@ -57,23 +53,16 @@ async function insertionSort(itemArray) {
 async function shellSort(itemArray) {
     for (let gap = ~~(itemArray.length / 2); gap > 0; gap = ~~(gap / 2)) {
         for (let i = gap, j; i < itemArray.length; i++) {
-
             let temp = itemArray[i];
-            temp.style.backgroundColor = markerItemColour;
-
             for (j = i; j >= gap; j -= gap) {
-                let item1 = itemArray[j];
-                let item2 = itemArray[j - gap];
-                
-                await setItemPairColour(item1, item2, selectedItemColour);
-                if (getValue(item2) > getValue(temp)) {
-                    // itemArray[j] = itemArray[j - gap];
-                    await swap(item1, item2);
-                }
+                [item1, item2] = await selectItemsByIndex(itemArray, j, j - gap);
 
+                if (getValue(item2) > getValue(temp)) {
+                    await swap(itemArray, j, j - gap);
+                }
                 await setItemPairColour(item1, item2, defaultItemColour, false);
             }
-            await swap(temp, itemArray[j]);
+            await swap(itemArray, i, j);
             temp.style.backgroundColor = defaultItemColour;
             // itemArray[j] = temp;
         }
@@ -81,26 +70,20 @@ async function shellSort(itemArray) {
 }
 
 async function selectionSort(itemArray) {
-    for (let i = 0; i < itemArray.length - 1; i++) {
-        let minValueIndex = i;
+    for (let current = 0; current < itemArray.length - 1; current++) {
+        let minIndex = current;
         let minItem, nextItem;
 
-        for (let j = i + 1; j < itemArray.length; j++) {
-            minItem = itemArray[minValueIndex];
-            nextItem = itemArray[j];
-
-            await setItemPairColour(minItem, nextItem, selectedItemColour);
+        for (let next = current + 1; next < itemArray.length; next++) {
+            [minItem, nextItem] = await selectItemsByIndex(itemArray, minIndex, next);
 
             if (getValue(nextItem) < getValue(minItem)) {
-                minValueIndex = j;
+                minIndex = next;
             }
             await setItemPairColour(minItem, nextItem, defaultItemColour, false);
         }
-        
-        let currentItem = itemArray[i];
-        await setItemPairColour(minItem, currentItem, selectedItemColour);
-
-        await swap(itemArray, minValueIndex, i);
+        [currentItem, minItem] = await selectItemsByIndex(itemArray, current, minIndex);
+        await swap(itemArray, minIndex, current);
         await setItemPairColour(minItem, currentItem, defaultItemColour);
     }
 }
@@ -115,6 +98,13 @@ async function quickSort(itemArray) {
 
 // ------- SORT ITEM LOGIC -------
 
+async function selectItemsByIndex(arr, index1, index2) {
+    let item1 = arr[index1];
+    let item2 = arr[index2];
+    await setItemPairColour(item1, item2, selectedItemColour);
+    return [item1, item2];
+}
+
 async function setItemPairColour(item1, item2, colour, addDelay = true) {
     item1.style.backgroundColor = colour;
     item2.style.backgroundColor = colour;
@@ -125,9 +115,10 @@ async function setItemPairColour(item1, item2, colour, addDelay = true) {
 
 function createSortItem(index, width, height, value) {
     let item = document.createElement("div");
-    item.style.width = `${width}px`
+    item.style.width = `${width}px`;
     item.style.height = `${height}px`;
     item.style.transform = `translateX(${index * width}px)`;
+    item.style.transition = `transform ${delayMilliseconds}ms`;
     item.classList.add("sortItem");
 
     let label = createValueLabel(value);
@@ -192,10 +183,10 @@ function getItemHeightModifier() {
 function getArraySize() {
     let arraySize = document.getElementById("arrSize").value;
     let size = parseInt(arraySize);
-    if (size >= 2 && size <= 50){
+    if (size >= 2 && size <= maxArraySize){
         return size;
     }
-    alert("Please enter a number between 2 and 50");
+    alert(`Please enter a number between 2 and ${maxArraySize}`);
 }
 
 function updateTimerMessage(sortName, resetting = false) {
@@ -221,6 +212,8 @@ function runSorting(sortFunction, sortName) {
 
     let itemArray = Array.from(document.querySelectorAll(".sortItem"));
     sortFunction(itemArray);
+
+    // could reenable sorting buttons here
 }
 // -------------
 
@@ -229,12 +222,13 @@ function runSorting(sortFunction, sortName) {
 
 const fieldHeight = 500;
 const fieldWidthModifier = 0.75;
-const defaultArraySize = 20;
+const defaultArraySize = 50;
+const maxArraySize = 100;
 const maxItemValue = 50;
 const defaultItemColour = "#384EC7";
 const selectedItemColour = "#38C7B1";
 const markerItemColour = "#FFFFFF";
-const delayMilliseconds = 500;
+const delayMilliseconds = 0;
 
 var field;
 var seconds;
