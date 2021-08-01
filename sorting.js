@@ -1,6 +1,6 @@
 // ------- SORTING ALGORITHMS -------
 
-function swap(arr, index1, index2) {
+function swap(arr, index1, index2, addRecolorDelay = false) {
     return new Promise(resolve => {
         let item1 = arr[index1];
         let item2 = arr[index2];
@@ -15,6 +15,7 @@ function swap(arr, index1, index2) {
             function() {
                 setTimeout(() => {
                     [arr[index1], arr[index2]] = [arr[index2], arr[index1]];
+                    setItemPairColour(item1, item2, defaultItemColour, addRecolorDelay);
                     resolve();
                 }, delayMilliseconds);
             }); 
@@ -29,7 +30,9 @@ async function bubbleSort(itemArray) {
             if (getValue(item1) > getValue(item2)) {
                 await swap(itemArray, j, j + 1);
             }
-            await setItemPairColour(item1, item2, defaultItemColour, false);
+            if (item1.style.backgroundColor !== defaultItemColour) {
+                await setItemPairColour(item1, item2, defaultItemColour, false);
+            }
         }
     }
 }
@@ -44,27 +47,6 @@ async function insertionSort(itemArray) {
                 break;
             }
             await swap(itemArray, current, current - 1);
-            await setItemPairColour(currentItem, previousItem, defaultItemColour, false);
-        }
-    }
-}
-
-// ye this doesn't work 
-async function shellSort(itemArray) {
-    for (let gap = ~~(itemArray.length / 2); gap > 0; gap = ~~(gap / 2)) {
-        for (let i = gap, j; i < itemArray.length; i++) {
-            let temp = itemArray[i];
-            for (j = i; j >= gap; j -= gap) {
-                [item1, item2] = await selectItemsByIndex(itemArray, j, j - gap);
-
-                if (getValue(item2) > getValue(temp)) {
-                    await swap(itemArray, j, j - gap);
-                }
-                await setItemPairColour(item1, item2, defaultItemColour, false);
-            }
-            await swap(itemArray, i, j);
-            temp.style.backgroundColor = defaultItemColour;
-            // itemArray[j] = temp;
         }
     }
 }
@@ -83,15 +65,53 @@ async function selectionSort(itemArray) {
             await setItemPairColour(minItem, nextItem, defaultItemColour, false);
         }
         [currentItem, minItem] = await selectItemsByIndex(itemArray, current, minIndex);
-        await swap(itemArray, minIndex, current);
-        await setItemPairColour(minItem, currentItem, defaultItemColour);
+        await swap(itemArray, minIndex, current, true);
     }
 }
 
 async function heapSort(itemArray) {
 }
 
-async function quickSort(itemArray) {
+
+function pickPivotIndex(start, end) {
+    let min = start;
+    let max = end + 1;
+    return Math.floor(Math.random() * (max - min) + min); 
+}
+
+async function partition(itemArray, start, end) {
+    let pivot = pickPivotIndex(start, end);
+    
+    [pivotItem, endItem] = await selectItemsByIndex(itemArray, pivot, end);
+    await swap(itemArray, pivot, end, false);
+
+    let leftBorder = start;
+    let leftItem = itemArray[leftBorder];
+    leftItem.style.backgroundColor = selectedItemColour;
+
+    for (let current = start; current < end; current++) {
+        let currentItem = itemArray[current];
+        currentItem.style.backgroundColor = selectedItemColour;
+        
+        if (getValue(currentItem) < getValue(pivotItem)) {
+            await swap(itemArray, current, leftBorder, false);
+            leftBorder++;
+            leftItem = itemArray[leftBorder];
+            leftItem.style.backgroundColor = selectedItemColour;
+        }
+    }
+    await swap(itemArray, leftBorder, end, false);   
+    return leftBorder;
+}
+
+async function quickSort(itemArray, start = 0, end = itemArray.length - 1) {
+    if (start >= end) {
+        return;
+    }
+
+    pivot = await partition(itemArray, start, end);
+    await quickSort(itemArray, start, pivot - 1);
+    await quickSort(itemArray, pivot + 1, end);
 }
 // -------------
 
@@ -121,15 +141,18 @@ function createSortItem(index, width, height, value) {
     item.style.transition = `transform ${delayMilliseconds}ms`;
     item.classList.add("sortItem");
 
-    let label = createValueLabel(value);
+    let label = createValueLabel(value, width);
     item.appendChild(label);
     return item;
 }
 
-function createValueLabel(value) {
+function createValueLabel(value, width) {
     let label = document.createElement("div");
     label.innerHTML = value;
     label.classList.add("sortItemLabel");
+    if (width <= minWidthForLabel) {
+        label.style.visibility = "hidden";
+    }
     return label;
 }   
 
@@ -146,8 +169,10 @@ function getValue(sortItem) {
 // ------- WINDOW UTILITY FUNCTIONS -------
 
 function resetWindowState() {
+    // todo find a way to cancel a sort function if one is already running
+    itemArray = [];
     removeChildren(field);
-    disableSortButtons(false);
+    setSortButtonsState(true);
     updateTimerMessage("", true);
 }
 
@@ -168,9 +193,13 @@ function generateItemArray(arraySize) {
         let sortItem = createSortItem(i, itemWidth, values[i] * itemHeightModifier, values[i]);
         field.appendChild(sortItem);
     }
+
+    return Array.from(document.querySelectorAll(".sortItem"));
 }
 
 function getItemHeightModifier() {
+    // todo figure this thing out
+
     // let fh = field.clientHeight;
     // let temp = fh / maxItemValue;
     // let res = Math.floor(temp) - 1;
@@ -199,21 +228,18 @@ function updateTimerMessage(sortName, resetting = false) {
     timerSpan.innerHTML = resetting ? "" : "00:00"
 }
 
-function disableSortButtons(disable) {
+function setSortButtonsState(enable) {
     let buttons = document.querySelectorAll(".sortButton");
     for (let button of buttons) {
-        button.disabled = disable;
+        button.disabled = !enable;
     }
 }
 
-function runSorting(sortFunction, sortName) {
-    disableSortButtons(true);
+async function runSorting(sortFunction, sortName) {
+    setSortButtonsState(false);
     updateTimerMessage(sortName);
-
-    let itemArray = Array.from(document.querySelectorAll(".sortItem"));
-    sortFunction(itemArray);
-
-    // could reenable sorting buttons here
+    await sortFunction(itemArray);
+    setSortButtonsState(true);
 }
 // -------------
 
@@ -223,13 +249,15 @@ function runSorting(sortFunction, sortName) {
 const fieldHeight = 500;
 const fieldWidthModifier = 0.75;
 const defaultArraySize = 50;
-const maxArraySize = 100;
+const maxArraySize = 200;
 const maxItemValue = 50;
+const minWidthForLabel = 17.5;
 const defaultItemColour = "#384EC7";
 const selectedItemColour = "#38C7B1";
 const markerItemColour = "#FFFFFF";
 const delayMilliseconds = 0;
 
+var itemArray;
 var field;
 var seconds;
 
@@ -238,10 +266,10 @@ window.onload = function() {
     field.setAttribute("width", `${window.innerWidth * fieldWidthModifier}px`);
     field.setAttribute("height", `${fieldHeight}px`);
 
-    generateItemArray(defaultArraySize);
+    itemArray = generateItemArray(defaultArraySize);
     document.getElementById("arrayGenerator").onclick = function() {
         let arraySize = getArraySize();
-        generateItemArray(arraySize);
+        itemArray = generateItemArray(arraySize);
     };
 
     document.getElementById("bubblesort").onclick = function () {
@@ -250,9 +278,6 @@ window.onload = function() {
     document.getElementById("insertionsort").onclick = function () {
         runSorting(insertionSort, "Insertion Sort");
     };
-    document.getElementById("shellsort").onclick = function () {
-        runSorting(shellSort, "Shell Sort");
-    }; 
     document.getElementById("selectionsort").onclick = function () {
         runSorting(selectionSort, "Selection Sort");
     };
