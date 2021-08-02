@@ -1,15 +1,17 @@
 // ------- SORTING ALGORITHMS -------
 
+function swapTransforms(item1, item2) {
+    let tf1 = getComputedStyle(item1).getPropertyValue("transform");
+    let tf2 = getComputedStyle(item2).getPropertyValue("transform");
+    item1.style.transform = tf2;
+    item2.style.transform = tf1;
+}
+
 function swap(arr, index1, index2, addRecolorDelay = false) {
     return new Promise(resolve => {
         let item1 = arr[index1];
         let item2 = arr[index2];
-
-        let tf1 = getComputedStyle(item1).getPropertyValue("transform");
-        let tf2 = getComputedStyle(item2).getPropertyValue("transform");
-
-        item1.style.transform = tf2;
-        item2.style.transform = tf1;
+        swapTransforms(item1, item2);
 
         requestAnimationFrame(
             function() {
@@ -84,6 +86,7 @@ async function partition(itemArray, start, end) {
     
     [pivotItem, endItem] = await selectItemsByIndex(itemArray, pivot, end);
     await swap(itemArray, pivot, end, false);
+    pivotItem.style.backgroundColor = markerItemColour;
 
     let leftBorder = start;
     let leftItem = itemArray[leftBorder];
@@ -98,6 +101,10 @@ async function partition(itemArray, start, end) {
             leftBorder++;
             leftItem = itemArray[leftBorder];
             leftItem.style.backgroundColor = selectedItemColour;
+        }
+
+        if (leftItem !== currentItem) {
+            currentItem.style.backgroundColor = defaultItemColour;
         }
     }
     await swap(itemArray, leftBorder, end, false);   
