@@ -1,10 +1,10 @@
-// ------- SORTING ALGORITHMS -------
+// ------- SORTING -------
 
 function swapTransforms(item1, item2) {
-    let tf1 = getComputedStyle(item1).getPropertyValue("transform");
-    let tf2 = getComputedStyle(item2).getPropertyValue("transform");
-    item1.style.transform = tf2;
-    item2.style.transform = tf1;
+    let transform1 = getComputedStyle(item1).getPropertyValue("transform");
+    let transform2 = getComputedStyle(item2).getPropertyValue("transform");
+    item1.style.transform = transform2;
+    item2.style.transform = transform1;
 }
 
 function swap(arr, index1, index2, addRecolorDelay = false) {
@@ -32,6 +32,7 @@ async function bubbleSort(itemArray) {
             if (getValue(item1) > getValue(item2)) {
                 await swap(itemArray, j, j + 1);
             }
+
             if (item1.style.backgroundColor !== defaultItemColour) {
                 await setItemPairColour(item1, item2, defaultItemColour, false);
             }
@@ -48,6 +49,7 @@ async function insertionSort(itemArray) {
                 await setItemPairColour(currentItem, previousItem, defaultItemColour, false);
                 break;
             }
+
             await swap(itemArray, current, current - 1);
         }
     }
@@ -66,14 +68,51 @@ async function selectionSort(itemArray) {
             }
             await setItemPairColour(minItem, nextItem, defaultItemColour, false);
         }
+
         [currentItem, minItem] = await selectItemsByIndex(itemArray, current, minIndex);
         await swap(itemArray, minIndex, current, true);
     }
 }
 
-async function heapSort(itemArray) {
+async function sinkElement(itemArray, index, arraySize) {
+    let current = index;
+    let placed = false;
+    let maxChild = 2 * current + 1;
+
+    while (!placed && maxChild < arraySize) {
+        if (maxChild < arraySize - 1 && getValue(itemArray[maxChild]) < getValue(itemArray[maxChild + 1])) {
+            maxChild++;
+        } 
+
+        [currentItem, maxItem] = await selectItemsByIndex(itemArray, current, maxChild);
+
+        if (getValue(currentItem) < getValue(maxItem)) {
+            await swap(itemArray, current, maxChild, false);
+        }
+        else {
+            placed = true;
+            setItemPairColour(currentItem, maxItem, defaultItemColour);
+        }
+
+        current = maxChild;
+        maxChild = 2 * current + 1;
+    }
 }
 
+async function heapSort(itemArray) {
+    let count = itemArray.length;
+
+    for (let i = Math.floor((count - 1) / 2); i > -1; i--) {
+        await sinkElement(itemArray, i, count);        
+    }
+
+    while (count > 0) {
+        [maxItem, lastItem] = await selectItemsByIndex(itemArray, 0, count - 1);
+        await swap(itemArray, 0, count - 1, false);
+        count--;
+        await sinkElement(itemArray, 0, count);
+    }
+}
 
 function pickPivotIndex(start, end) {
     let min = start;
@@ -88,27 +127,24 @@ async function partition(itemArray, start, end) {
     await swap(itemArray, pivot, end, false);
     pivotItem.style.backgroundColor = markerItemColour;
 
-    let leftBorder = start;
-    let leftItem = itemArray[leftBorder];
-    leftItem.style.backgroundColor = selectedItemColour;
+    [leftItem, leftIndex] = selectNextItem(itemArray, start - 1);
 
     for (let current = start; current < end; current++) {
         let currentItem = itemArray[current];
         currentItem.style.backgroundColor = selectedItemColour;
         
         if (getValue(currentItem) < getValue(pivotItem)) {
-            await swap(itemArray, current, leftBorder, false);
-            leftBorder++;
-            leftItem = itemArray[leftBorder];
-            leftItem.style.backgroundColor = selectedItemColour;
+            await swap(itemArray, current, leftIndex, false);
+            [leftItem, leftIndex] = selectNextItem(itemArray, leftIndex);
         }
 
         if (leftItem !== currentItem) {
             currentItem.style.backgroundColor = defaultItemColour;
         }
     }
-    await swap(itemArray, leftBorder, end, false);   
-    return leftBorder;
+
+    await swap(itemArray, leftIndex, end, false);   
+    return leftIndex;
 }
 
 async function quickSort(itemArray, start = 0, end = itemArray.length - 1) {
@@ -130,6 +166,13 @@ async function selectItemsByIndex(arr, index1, index2) {
     let item2 = arr[index2];
     await setItemPairColour(item1, item2, selectedItemColour);
     return [item1, item2];
+}
+
+function selectNextItem(arr, index) {
+    let nextIndex = index + 1;
+    let nextItem = arr[nextIndex];
+    nextItem.style.backgroundColor = selectedItemColour;
+    return [nextItem, nextIndex];
 }
 
 async function setItemPairColour(item1, item2, colour, addDelay = true) {
@@ -160,6 +203,7 @@ function createValueLabel(value, width) {
     if (width <= minWidthForLabel) {
         label.style.visibility = "hidden";
     }
+
     return label;
 }   
 
@@ -222,6 +266,7 @@ function getArraySize() {
     if (size >= 2 && size <= maxArraySize){
         return size;
     }
+
     alert(`Please enter a number between 2 and ${maxArraySize}`);
 }
 
