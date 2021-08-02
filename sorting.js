@@ -213,10 +213,6 @@ function getValue(sortItem) {
 // -------------
 
 
-// ------- TIMER LOGIC -------
-// -------------
-
-
 // ------- WINDOW UTILITY FUNCTIONS -------
 
 function resetWindowState() {
@@ -224,7 +220,12 @@ function resetWindowState() {
     itemArray = [];
     removeChildren(field);
     setSortButtonsState(true);
-    updateTimerMessage("", true);
+    updateTimerMessage(defaultTimerMessage);
+}
+
+function updateTimerMessage(message) {
+    let messageSpan = document.getElementById("timerMessage");
+    messageSpan.innerHTML = message;
 }
 
 function removeChildren(element) {
@@ -270,16 +271,6 @@ function getArraySize() {
     alert(`Please enter a number between 2 and ${maxArraySize}`);
 }
 
-function updateTimerMessage(sortName, resetting = false) {
-    let messageSpan = document.getElementById("timerMessage");
-    messageSpan.innerHTML = resetting ? 
-    "Choose a sorting algorithm to begin" : `Sorting using ${sortName}:`;
-
-    // todo figure out what to put instead of 00:00
-    let timerSpan = document.getElementById("timer");
-    timerSpan.innerHTML = resetting ? "" : "00:00"
-}
-
 function setSortButtonsState(enable) {
     let buttons = document.querySelectorAll(".sortButton");
     for (let button of buttons) {
@@ -287,10 +278,40 @@ function setSortButtonsState(enable) {
     }
 }
 
+function formatElapsedTimeForDisplay(milliseconds) {
+    let minutes = Math.floor(milliseconds / 60000);
+    let seconds = ((milliseconds % 60000) / 1000).toFixed(0);
+    if (seconds === 60) {
+        minutes++;
+        seconds = 0;
+    }
+    
+    let ms = milliseconds % 1000;
+    return `${formatToTwoDigits(minutes)}:${formatToTwoDigits(seconds)}.${ms}`;
+}
+
+function formatToTwoDigits(time) {
+    return time < 10 ?
+        "0" + time : time;
+}
+
+function getSuccessMessage(elapsedTime) {
+    let time = formatElapsedTimeForDisplay(elapsedTime);
+    return `Sorted ${itemArray.length} numbers in ${time}!`;
+}
+
+
 async function runSorting(sortFunction, sortName) {
     setSortButtonsState(false);
-    updateTimerMessage(sortName);
+    updateTimerMessage(`Sorting using ${sortName}...`);
+
+    let startTime = Date.now();
     await sortFunction(itemArray);
+    let endTime = Date.now();
+    
+    let message = getSuccessMessage(endTime - startTime);
+    updateTimerMessage(message);
+    
     setSortButtonsState(true);
 }
 // -------------
@@ -308,10 +329,10 @@ const defaultItemColour = "#384EC7";
 const selectedItemColour = "#38C7B1";
 const markerItemColour = "#FFFFFF";
 const delayMilliseconds = 0;
+const defaultTimerMessage = "Choose a sorting algorithm to begin";
 
 var itemArray;
 var field;
-var seconds;
 
 window.onload = function() {
     field = document.getElementById("animationField");
