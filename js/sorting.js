@@ -19,7 +19,7 @@ function swap(arr, index1, index2, addRecolorDelay = false) {
                     [arr[index1], arr[index2]] = [arr[index2], arr[index1]];
                     SortItem.setPairColour(item1, item2, SortItem.defaultColour, addRecolorDelay);
                     resolve();
-                }, SortItem.delayMilliseconds);
+                }, SortItem.transitionDuration);
             }); 
     }); 
 }

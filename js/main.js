@@ -1,13 +1,6 @@
 import * as SortAlgorithms from "./sorting.js";
+import * as FT from "./functionTimer.js";
 import { create as createSortItem } from "./sortItem.js";
-
-function resetWindowState(timerMessage) {
-    // todo find a way to cancel a sort function if one is already running
-    itemArray = [];
-    removeChildren(field);
-    setSortButtonsState(true);
-    updateTimerMessage(timerMessage);
-}
 
 function updateTimerMessage(message) {
     let messageSpan = document.getElementById("timerMessage");
@@ -21,7 +14,6 @@ function removeChildren(element) {
 }
 
 function generateItemArray(arraySize) {
-    resetWindowState(defaultTimerMessage);
     let itemWidth = field.clientWidth / arraySize;
     let itemHeightModifier = getItemHeightModifier();
     let values = Array.from({length: arraySize}, () => Math.floor(Math.random() * maxItemValue) + 1);
@@ -53,50 +45,38 @@ function getArraySize() {
         return size;
     }
 
-    alert(`Please enter a number between 2 and ${maxArraySize}`);
+    alert(`Please enter a number between 2 and ${maxArraySize}.`);
 }
 
-function setSortButtonsState(enable) {
+function setButtonsState(enable) {
+    let generatorButton = document.getElementById("arrayGenerator");
+    generatorButton.disabled = !enable;
+
     let buttons = document.querySelectorAll(".sortButton");
     for (let button of buttons) {
         button.disabled = !enable;
     }
 }
 
-function formatElapsedTimeForDisplay(milliseconds) {
-    let minutes = Math.floor(milliseconds / 60000);
-    let seconds = ((milliseconds % 60000) / 1000).toFixed(0);
-    if (seconds === 60) {
-        minutes++;
-        seconds = 0;
-    }
-    
-    let ms = milliseconds % 1000;
-    return `${formatToTwoDigits(minutes)}:${formatToTwoDigits(seconds)}.${ms}`;
-}
-
-function formatToTwoDigits(time) {
-    return time < 10 ?
-    "0" + time : time;
-}
-
-function getSuccessMessage(elapsedTime) {
-    let time = formatElapsedTimeForDisplay(elapsedTime);
-    return `Sorted ${itemArray.length} numbers in ${time}!`;
+function resetWindowState(timerMessage) {
+    itemArray = [];
+    removeChildren(field);
+    setButtonsState(true);
+    timer.reset();
+    updateTimerMessage(timerMessage);
 }
 
 async function runSorting(sortFunction, sortName) {
-    setSortButtonsState(false);
+    setButtonsState(false);
     updateTimerMessage(`Sorting using ${sortName}...`);
 
-    let startTime = Date.now();
-    await sortFunction(itemArray);
-    let endTime = Date.now();
-    
-    let message = getSuccessMessage(endTime - startTime);
+    let timer = new FT.FunctionTimer(() => sortFunction(itemArray));
+    await timer.run();
+
+    let message = `Sorted ${itemArray.length} numbers in ${timer.formatElapsedTime()}!`;
     updateTimerMessage(message);
-    
-    setSortButtonsState(true);
+
+    setButtonsState(true);
 }
 
 const fieldHeight = 500;
@@ -108,6 +88,7 @@ const defaultTimerMessage = "Choose a sorting algorithm to begin";
 
 var itemArray;
 var field;
+var timer = new FT.FunctionTimer();
 
 window.onload = function() {
     field = document.getElementById("animationField");
@@ -117,6 +98,11 @@ window.onload = function() {
     itemArray = generateItemArray(defaultArraySize);
     document.getElementById("arrayGenerator").onclick = function() {
         let arraySize = getArraySize();
+        if (!arraySize) {
+            return;
+        }
+
+        resetWindowState(defaultTimerMessage);
         itemArray = generateItemArray(arraySize);
     };
 

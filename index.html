@@ -9,12 +9,10 @@
     <div class="row">
         <div class="rowContents">
             <h3>
-                <span>
-                    Generate an array of
-                    <input type="number" id="arrSize" min="2" max="200" value="50">
-                    numbers:
-                    <input type="submit" id="arrayGenerator" value="Generate">
-                </span>
+                Generate an array of
+                <input type="number" id="arrSize" min="2" max="200" value="50">
+                numbers:
+                <input type="submit" id="arrayGenerator" value="Generate">
             </h3>
         </div>
     </div>
@@ -22,61 +20,71 @@
         <div class="rowContents">
             <div class="tooltip">
                 <span class="tooltipText">
-                    Average time complexity: O(n^2)
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-                    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-                    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-                    consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-                    cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-                    proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                    <p>
+                        Checks adjacent items and swaps them if necessary. 
+                    </p>
+                    <p>
+                        Average time complexity: O(n^2).
+                    </p>
+                    <p>
+                        Don't use it for large arrays.
+                    </p>
                 </span>
                 <input type="button" class="sortButton" id="bubblesort" value="Bubble Sort"> 
             </div>
             <div class="tooltip">
                 <span class="tooltipText">
-                    Average time complexity: O(n^2)
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-                    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-                    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-                    consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-                    cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-                    proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                    <p>
+                        Takes the leftmost unsorted item and compares it with already sorted ones until it can't be swapped with an item directly to the left of it. 
+                    </p>
+                    <p>                    
+                        Average time complexity: O(n^2).
+                    </p>
+                    <p>
+                        A great choice if your array is already sorted.
+                    </p>
                 </span>
-                <input type="button" class="sortButton" id="insertionsort" value="Insertion Sort"> 
+                <input type="button" class="sortButton" id="insertionsort" value="Insertion Sort">
             </div>
             <div class="tooltip">
                 <span class="tooltipText">
-                    Average time complexity: O(n^2)
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-                    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-                    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-                    consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-                    cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-                    proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                    <p>
+                        Checks all unsorted items in the array to find the smallest of them, then swaps it with the leftmost unsorted item. 
+                    </p>
+                    <p>
+                        Average time complexity: O(n^2). 
+                    </p>
+                    <p>
+                        The coolest O(n^2) sorting algorithm in terms of visuals.
+                    </p>
                 </span>
                 <input type="button" class="sortButton" id="selectionsort" value="Selection Sort">  
             </div>
             <div class="tooltip">
                 <span class="tooltipText">
-                    Average time complexity: O(n*log(n))
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-                    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-                    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-                    consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-                    cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-                    proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                    <p>
+                        Builds a max heap out of all unsorted items, then takes the root and swaps it with the last unsorted item. Repeats until all items are in their proper places.
+                    </p>
+                    <p>
+                        Average time complexity: O(n*log(n)).
+                    </p>
+                    <p>
+                        I really like how this one looks.
+                    </p>
                 </span>
                 <input type="button" class="sortButton" id="heapsort" value="Heapsort"> 
             </div>
             <div class="tooltip">
                 <span class="tooltipText">
-                    Average time complexity: O(n*log(n))
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-                    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-                    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-                    consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-                    cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-                    proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                    <p>
+                        Randomly picks a pivot item, then places all items less than the pivot to the left of it (items greater than the pivot go to the right of it). Then recursively repeats the same procedure for both sides of the array. 
+                    </p>
+                    <p>
+                        Average time complexity: O(n*log(n)).
+                    </p>
+                    <p>
+                        I feel like it's a bit hard to understand how this one works just by looking at a visualisation.
+                    </p>
                 </span>
                 <input type="button" class="sortButton" id="quicksort" value="Quick Sort"> 
             </div>
@@ -85,7 +93,7 @@
     <div class="row">
         <div class="rowContents">
             <h4>
-                <span id="timerMessage"></span>
+                <span id="timerMessage">Choose a sorting algorithm to begin</span>
             </h4>
         </div>
     </div>
