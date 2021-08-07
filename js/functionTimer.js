@@ -7,6 +7,8 @@ export class FunctionTimer {
 
         this.timedFunction = timedFunction;
         this.#elapsed = 0;
+        this.inactiveTime = 0;
+        this.#inactivePeriodStart = null;
     }
 
     get elapsed() {
@@ -25,11 +27,32 @@ export class FunctionTimer {
         this._timedFunction = timedFunction;
     }
 
+    get inactivePeriodStart() {
+        return this._inactivePeriodStart;
+    }
+
+    set #inactivePeriodStart(value) {
+        this._inactivePeriodStart = value;
+    }
+
+    get inactiveTime() {
+        return this._inactiveTime;
+    }
+
+    set inactiveTime(value) {
+        this._inactiveTime = value;
+    }
+
     reset() {
-        this._elapsed = 0;
+        this.#elapsed = 0;
+        this.inactiveTime = 0;
     }
 
     async run() {
+        document.addEventListener(
+            "visibilitychange", 
+            () => { FunctionTimer.visibilityListener(this) });
+
         let start = Date.now();
         await this._timedFunction();
         let end = Date.now();
@@ -37,8 +60,7 @@ export class FunctionTimer {
     }
 
     #calculateActiveTime(start, end) {
-        // todo track inactive periods 
-        return end - start;
+        return end - start - this.inactiveTime;
     }
 
     formatElapsedTime() {
@@ -49,11 +71,25 @@ export class FunctionTimer {
             seconds = 0;
         }
 
+        let formattedMinutes = FunctionTimer.#formatToTwoDigits(minutes);
+        let formattedSeconds = FunctionTimer.#formatToTwoDigits(seconds);
         let milliseconds = this._elapsed % 1000;
-        return `${FunctionTimer.#formatToTwoDigits(minutes)}:${FunctionTimer.#formatToTwoDigits(seconds)}.${milliseconds}`;
+        return `${formattedMinutes}:${formattedSeconds}.${milliseconds}`;
     }
 
     static #formatToTwoDigits(time) {
         return time < 10 ? "0" + time : time;
+    }
+
+    static visibilityListener(functionTimer) {
+        switch(document.visibilityState) {
+            case "hidden":
+                functionTimer._inactivePeriodStart = Date.now();
+                break;
+            case "visible":
+                functionTimer._inactiveTime += Date.now() - functionTimer._inactivePeriodStart; 
+                functionTimer._inactivePeriodStart = 0;
+                break;
+        }
     }
 }

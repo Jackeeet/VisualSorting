@@ -79,7 +79,6 @@ h4 {
 
 .tooltip .tooltipText {
     visibility: hidden;
-    /*width: 150%;*/
     width: 200px;
     background-color: #FFFFFF;
     color: #384EC7;

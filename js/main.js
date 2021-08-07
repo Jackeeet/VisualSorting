@@ -28,14 +28,12 @@ function generateItemArray(arraySize) {
 
 function getItemHeightModifier() {
     // todo figure this thing out
-
     // let fh = field.clientHeight;
     // let temp = fh / maxItemValue;
     // let res = Math.floor(temp) - 1;
-
     // return Math.floor(field.height / maxItemValue) - 1;
 
-    return 10;
+    return 9.5;
 }
 
 function getArraySize() {
@@ -52,8 +50,8 @@ function setButtonsState(enable) {
     let generatorButton = document.getElementById("arrayGenerator");
     generatorButton.disabled = !enable;
 
-    let buttons = document.querySelectorAll(".sortButton");
-    for (let button of buttons) {
+    let sortButtons = document.querySelectorAll(".sortButton");
+    for (let button of sortButtons) {
         button.disabled = !enable;
     }
 }
@@ -84,7 +82,7 @@ const fieldWidthModifier = 0.75;
 const defaultArraySize = 50;
 const maxArraySize = 200;
 const maxItemValue = 50;
-const defaultTimerMessage = "Choose a sorting algorithm to begin";
+const defaultTimerMessage = document.getElementById("timerMessage").innerHTML;
 
 var itemArray;
 var field;
