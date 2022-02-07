@@ -41,12 +41,14 @@ export function create(index, width, heightFactor, value, transformDuration) {
     return item;
 }
 
-export function resizeAll(width, heightFactor) {
-    let items = Array.from(document.querySelectorAll(".sortItem"));
+export function resizeAll(items, width, heightFactor) {
     for (let i = 0; i < items.length; i++) {
         items[i].style.width = `${width}px`;
         items[i].style.height = `${items[i].id * heightFactor}px`;
         items[i].style.transform = `translateX(${i * width}px)`;
+
+        items[i].children[0].style.visibility = (width <= minLabelWidth)? 
+            "hidden" : "visible";
     }
 }
 
