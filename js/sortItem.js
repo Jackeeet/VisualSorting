@@ -3,7 +3,7 @@ export const selectedColour = "#38C7B1";
 export const markerColour = "#FFFFFF";
 export const transitionDuration = 0;
 
-const minWidthForLabel = 17.5;
+const minLabelWidth = 28;
 
 export async function selectPairByIndex(arr, index1, index2) {
     let item1 = arr[index1];
@@ -44,7 +44,7 @@ function createValueLabel(value, width) {
     let label = document.createElement("div");
     label.innerHTML = value;
     label.classList.add("sortItemLabel");
-    if (width <= minWidthForLabel) {
+    if (width <= minLabelWidth) {
         label.style.visibility = "hidden";
     }
 

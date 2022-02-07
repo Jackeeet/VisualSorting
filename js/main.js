@@ -33,11 +33,12 @@ function getItemHeightModifier() {
 function getArraySize() {
     let arraySize = document.getElementById("arrSize").value;
     let size = parseInt(arraySize);
-    if (size >= 2 && size <= maxArraySize){
+    if (size >= minArraySize && size <= maxArraySize){
         return size;
     }
 
-    alert(`Please enter a number between 2 and ${maxArraySize}.`);
+    alert(`Please enter a number between ${minArraySize} and ${maxArraySize}.`);
+    return false;
 }
 
 function setButtonsState(enable) {
@@ -79,6 +80,7 @@ function getFieldHeight() {
 
 const fieldWidthModifier = 0.75;
 const defaultArraySize = 50;
+const minArraySize = 2;
 const maxArraySize = 200;
 const maxItemValue = 200;
 const defaultTimerMessage = document.getElementById("timerMessage").innerHTML;
@@ -87,37 +89,30 @@ var itemArray;
 var field;
 var timer = new FT.FunctionTimer();
 
-window.onload = function() {
-    field = document.getElementById("animationField");
-    let fieldHeight = getFieldHeight();
-    document.getElementById("info").style.bottom = `${fieldHeight}px`;
-    field.style.height = `${fieldHeight}px`;
-    field.style.width = `${document.body.offsetWidth}px`;
+field = document.getElementById("animationField");
+let fieldHeight = getFieldHeight();
+document.getElementById("info").style.bottom = `${fieldHeight}px`;
+field.style.height = `${fieldHeight}px`;
+field.style.width = `${document.body.offsetWidth}px`;
 
-    itemArray = generateItemArray(defaultArraySize);
-    document.getElementById("arrayGenerator").onclick = function() {
-        let arraySize = getArraySize();
-        if (!arraySize) {
-            return;
-        }
+itemArray = generateItemArray(defaultArraySize);
+document.getElementById("arrayGenerator").onclick = function() {
+    let arraySize = getArraySize();
+    if (!arraySize) {
+        return;
+    }
 
-        resetWindowState(defaultTimerMessage);
-        itemArray = generateItemArray(arraySize);
-    };
+    resetWindowState(defaultTimerMessage);
+    itemArray = generateItemArray(arraySize);
+};
 
-    document.getElementById("bubblesort").onclick = function () {
-        runSorting(SortAlgorithms.bubbleSort, "Bubble Sort");
-    };
-    document.getElementById("insertionsort").onclick = function () {
-        runSorting(SortAlgorithms.insertionSort, "Insertion Sort");
-    };
-    document.getElementById("selectionsort").onclick = function () {
-        runSorting(SortAlgorithms.selectionSort, "Selection Sort");
-    };
-    document.getElementById("heapsort").onclick = function () {
-        runSorting(SortAlgorithms.heapSort, "Heapsort");
-    };
-    document.getElementById("quicksort").onclick = function () {
-        runSorting(SortAlgorithms.quickSort, "Quick Sort");
-    };
-}
+document.getElementById("bubblesort").onclick = () => 
+    runSorting(SortAlgorithms.bubbleSort, "Bubble Sort");
+document.getElementById("insertionsort").onclick = () => 
+    runSorting(SortAlgorithms.insertionSort, "Insertion Sort");
+document.getElementById("selectionsort").onclick = () =>
+    runSorting(SortAlgorithms.selectionSort, "Selection Sort");
+document.getElementById("heapsort").onclick = () =>
+    runSorting(SortAlgorithms.heapSort, "Heapsort");
+document.getElementById("quicksort").onclick = () =>
+    runSorting(SortAlgorithms.quickSort, "Quick Sort");
