@@ -27,10 +27,11 @@ export async function setPairColour(item1, item2, colour, addDelay = true) {
     }
 }
 
-export function create(index, width, height, value, transformDuration) {
+export function create(index, width, heightFactor, value, transformDuration) {
     let item = document.createElement("div");
+    item.id = value;
     item.style.width = `${width}px`;
-    item.style.height = `${height}px`;
+    item.style.height = `${value * heightFactor}px`;
     item.style.transform = `translateX(${index * width}px)`;
     item.style.transition = `transform ${transitionDuration}ms`;
     item.classList.add("sortItem");
@@ -38,6 +39,15 @@ export function create(index, width, height, value, transformDuration) {
     let label = createValueLabel(value, width);
     item.appendChild(label);
     return item;
+}
+
+export function resizeAll(width, heightFactor) {
+    let items = Array.from(document.querySelectorAll(".sortItem"));
+    for (let i = 0; i < items.length; i++) {
+        items[i].style.width = `${width}px`;
+        items[i].style.height = `${items[i].id * heightFactor}px`;
+        items[i].style.transform = `translateX(${i * width}px)`;
+    }
 }
 
 function createValueLabel(value, width) {
@@ -52,5 +62,5 @@ function createValueLabel(value, width) {
 }   
 
 export function getValue(sortItem) {
-    return parseInt(sortItem.childNodes[0].innerHTML);
+    return parseInt(sortItem.id);
 }

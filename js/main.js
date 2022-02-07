@@ -1,33 +1,31 @@
 import * as SortAlgorithms from "./sorting.js";
 import * as FT from "./functionTimer.js";
-import { create as createSortItem } from "./sortItem.js";
+import { create as createSortItem, resizeAll as resizeItems } from "./sortItem.js";
 
 function updateTimerMessage(message) {
     let messageSpan = document.getElementById("timerMessage");
     messageSpan.innerHTML = message;
 }
 
-function removeChildren(element) {
-    while(element.firstChild) {
-        element.removeChild(element.lastChild);
-    }
-}
-
 function generateItemArray(arraySize) {
-    let itemWidth = field.offsetWidth / arraySize;
-    let itemHeightModifier = getItemHeightModifier();
-    let values = Array.from({length: arraySize}, () => Math.floor(Math.random() * maxItemValue) + 1);
+    let values = Array.from(
+        { length: arraySize }, 
+        () => Math.floor(Math.random() * maxItemValue) + 1);
 
     for (let i = 0; i < arraySize; i++) {
-        let sortItem = createSortItem(i, itemWidth, values[i] * itemHeightModifier, values[i]);
+        let sortItem = createSortItem(i, getItemWidth(arraySize), getItemHeightFactor(), values[i]);
         field.appendChild(sortItem);
     }
 
     return Array.from(document.querySelectorAll(".sortItem"));
 }
 
-function getItemHeightModifier() {
+function getItemHeightFactor() {
     return Math.floor(field.clientHeight / maxItemValue);    
+}
+
+function getItemWidth(arraySize) {
+    return window.innerWidth / arraySize;
 }
 
 function getArraySize() {
@@ -53,7 +51,7 @@ function setButtonsState(enable) {
 
 function resetWindowState(timerMessage) {
     itemArray = [];
-    removeChildren(field);
+    clearField();
     setButtonsState(true);
     timer.reset();
     updateTimerMessage(timerMessage);
@@ -72,31 +70,39 @@ async function runSorting(sortFunction, sortName) {
     setButtonsState(true);
 }
 
-function getFieldHeight() {
-    let maxHeight = document.body.offsetHeight;
-    let infoBlockHeight = document.getElementById("info").offsetHeight;
-    return maxHeight - infoBlockHeight;
+function clearField() {
+    while(field.firstChild) {
+        field.removeChild(field.lastChild);
+    }
 }
 
-const fieldWidthModifier = 0.75;
+function getFieldHeight() {
+    let infoHeight = document.getElementById("info").offsetHeight;
+    return window.innerHeight - infoHeight;
+}
+
+function resizeField() {
+    console.log(`height: ${window.innerHeight} width: ${window.innerWidth}`);
+    field.style.height = `${getFieldHeight()}px`;
+    field.style.width = `${window.innerWidth}px`;
+    resizeItems(getItemWidth(getArraySize()), getItemHeightFactor());
+}
+
 const defaultArraySize = 50;
 const minArraySize = 2;
 const maxArraySize = 200;
 const maxItemValue = 200;
 const defaultTimerMessage = document.getElementById("timerMessage").innerHTML;
+const timer = new FT.FunctionTimer();
 
-var itemArray;
-var field;
-var timer = new FT.FunctionTimer();
 
-field = document.getElementById("animationField");
-let fieldHeight = getFieldHeight();
-document.getElementById("info").style.bottom = `${fieldHeight}px`;
-field.style.height = `${fieldHeight}px`;
-field.style.width = `${document.body.offsetWidth}px`;
+let field = document.getElementById("animationField");
+field.style.height = `${getFieldHeight()}px`;
+field.style.width = `${window.innerWidth}px`;
+window.onresize = resizeField;
 
-itemArray = generateItemArray(defaultArraySize);
-document.getElementById("arrayGenerator").onclick = function() {
+let itemArray = generateItemArray(defaultArraySize);
+document.getElementById("arrayGenerator").onclick = () => {
     let arraySize = getArraySize();
     if (!arraySize) {
         return;
