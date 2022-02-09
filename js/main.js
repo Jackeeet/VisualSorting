@@ -1,3 +1,6 @@
+import "core-js/stable";
+import "regenerator-runtime/runtime";
+
 import * as SortAlgorithms from "./sorting.js";
 import * as FT from "./functionTimer.js";
 import { create as createSortItem, resizeAll as resizeItems } from "./sortItem.js";
