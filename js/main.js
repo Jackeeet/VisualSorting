@@ -85,7 +85,6 @@ function getFieldHeight() {
 }
 
 function resizeField() {
-    console.log(`height: ${window.innerHeight} width: ${window.innerWidth}`);
     field.style.height = `${getFieldHeight()}px`;
     field.style.width = `${window.innerWidth}px`;
     resizeItems(itemArray, getItemWidth(itemArray.length), getItemHeightFactor());
